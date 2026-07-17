@@ -1,4 +1,4 @@
-import { ALGORITHMS, type AlgorithmKind, type AlgorithmMeta, type QueueState } from "./simulator";
+import { ALGORITHMS, type AlgorithmKind, type AlgorithmMeta, type BatchResult, type QueueState } from "./simulator";
 
 export interface DashboardCallbacks {
   onIntensityChange(value: number): void;
@@ -6,6 +6,7 @@ export interface DashboardCallbacks {
   onMuteToggle(): boolean;
   onReset(): void;
   onParamChange(kind: AlgorithmKind, a: number, b: number): void;
+  onSendBatch(n: number): void;
 }
 
 interface QueueRefs {
@@ -14,6 +15,7 @@ interface QueueRefs {
   flash: HTMLDivElement;
   accepted: HTMLElement;
   rejected: HTMLElement;
+  batch: HTMLElement;
   error: HTMLElement;
   paramError: HTMLElement;
   fieldA: HTMLInputElement;
@@ -39,6 +41,7 @@ function queueTemplate(meta: AlgorithmMeta): string {
         <span class="queue__stat--accept" data-accepted>0 admitted</span>
         <span class="queue__stat--reject" data-rejected>0 dropped</span>
       </div>
+      <div class="queue__batch" data-batch hidden></div>
       <div class="queue__error" data-error hidden></div>
     </div>`;
 }
@@ -93,6 +96,15 @@ function shellTemplate(): string {
     </section>
 
     <div class="toolbar">
+      <div class="batch-control">
+        <label for="batch-size">Batch size</label>
+        <input type="number" id="batch-size" min="1" step="1" value="15" aria-describedby="batch-hint" />
+        <button type="button" class="batch-button" id="batch-button">Fire batch (AllowN)</button>
+        <p class="batch-control__hint" id="batch-hint">
+          Sends one atomic AllowN request to all four limiters at the same instant --
+          every algorithm either admits the whole batch or rejects it, never partially.
+        </p>
+      </div>
       <button type="button" class="reset-button" id="reset-button">Reset simulation</button>
     </div>
 
@@ -137,6 +149,7 @@ export class Dashboard {
         flash: required(card.querySelector<HTMLDivElement>("[data-flash]"), "flash"),
         accepted: required(card.querySelector<HTMLElement>("[data-accepted]"), "accepted"),
         rejected: required(card.querySelector<HTMLElement>("[data-rejected]"), "rejected"),
+        batch: required(card.querySelector<HTMLElement>("[data-batch]"), "batch"),
         error: required(card.querySelector<HTMLElement>("[data-error]"), "error"),
         paramError: required(paramCard.querySelector<HTMLElement>("[data-param-error]"), "paramError"),
         fieldA: required(paramCard.querySelector<HTMLInputElement>("[data-field-a]"), "fieldA"),
@@ -168,6 +181,27 @@ export class Dashboard {
     const resetButton = required(root.querySelector<HTMLButtonElement>("#reset-button"), "#reset-button");
     resetButton.addEventListener("click", () => {
       this.callbacks.onReset();
+      for (const refs of this.queueRefs.values()) {
+        refs.batch.hidden = true;
+        refs.batch.textContent = "";
+        refs.batch.classList.remove("queue__batch--accept", "queue__batch--reject");
+      }
+    });
+
+    const batchInput = required(root.querySelector<HTMLInputElement>("#batch-size"), "#batch-size");
+    const batchButton = required(root.querySelector<HTMLButtonElement>("#batch-button"), "#batch-button");
+    const fireBatch = (): void => {
+      const raw = batchInput.valueAsNumber;
+      const n = Number.isFinite(raw) ? Math.max(1, Math.round(raw)) : 1;
+      batchInput.value = String(n);
+      this.callbacks.onSendBatch(n);
+    };
+    batchButton.addEventListener("click", fireBatch);
+    batchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        fireBatch();
+      }
     });
 
     for (const [kind, refs] of this.queueRefs) {
@@ -230,5 +264,28 @@ export class Dashboard {
     // Force a reflow so re-adding the same class restarts its animation.
     void refs.flash.offsetWidth;
     refs.flash.classList.add(activeClass);
+  }
+
+  /** Renders the outcome of a fired AllowN batch: a full-track flash plus a persistent pill. */
+  flashBatch(results: readonly BatchResult[]): void {
+    for (const result of results) {
+      const refs = this.queueRefs.get(result.kind);
+      if (!refs) {
+        continue;
+      }
+
+      refs.batch.hidden = false;
+      refs.batch.textContent = result.admitted
+        ? `batch of ${result.n}: admitted`
+        : `batch of ${result.n}: rejected`;
+      refs.batch.classList.remove("queue__batch--accept", "queue__batch--reject");
+      void refs.batch.offsetWidth;
+      refs.batch.classList.add(result.admitted ? "queue__batch--accept" : "queue__batch--reject");
+
+      const activeClass = result.admitted ? "queue__flash--accept" : "queue__flash--reject";
+      refs.flash.classList.remove("queue__flash--accept", "queue__flash--reject", "queue__flash--batch");
+      void refs.flash.offsetWidth;
+      refs.flash.classList.add(activeClass, "queue__flash--batch");
+    }
   }
 }
