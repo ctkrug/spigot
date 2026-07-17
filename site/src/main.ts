@@ -1,8 +1,62 @@
-// Scaffold entry point. The live burst-traffic simulator (four algorithms,
-// driven by the Go library compiled to WASM) lands in the BUILD phase per
-// docs/BACKLOG.md epic 1.
-const app = document.querySelector<HTMLDivElement>("#app");
+import "./style.css";
+import { loadWasm } from "./wasm";
+import { BurstSimulator } from "./simulator";
+import { Dashboard } from "./ui";
+import { SoundEngine } from "./soundfx";
 
-if (app) {
-  app.innerHTML = `<h1>Spigot</h1><p>Rate limiter simulator — coming soon.</p>`;
+const WASM_URL = "spigot.wasm";
+const INITIAL_INTENSITY = 20;
+
+function renderFatalError(root: HTMLElement, message: string): void {
+  root.innerHTML = `
+    <div class="hero">
+      <div class="wordmark"><span>SPIGOT</span></div>
+      <p class="tagline" role="alert">Couldn't start the simulator: ${message}</p>
+    </div>`;
 }
+
+async function main(): Promise<void> {
+  const root = document.querySelector<HTMLDivElement>("#app");
+  if (!root) {
+    return;
+  }
+
+  try {
+    await loadWasm(WASM_URL);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "failed to load the WebAssembly module";
+    renderFatalError(root, message);
+    return;
+  }
+
+  const sound = new SoundEngine();
+
+  const simulator = new BurstSimulator(
+    (states) => dashboard.update(states),
+    (kind, accepted) => {
+      dashboard.flashRequest(kind, accepted);
+      if (accepted) {
+        sound.playAccept();
+      } else {
+        sound.playReject();
+      }
+    },
+  );
+
+  const dashboard = new Dashboard(
+    root,
+    {
+      onIntensityChange: (value) => simulator.setIntensity(value),
+      onIntensityRelease: () => sound.playChirp(),
+      onMuteToggle: () => sound.toggleMuted(),
+      onReset: () => simulator.reset(),
+      onParamChange: (kind, a, b) => simulator.setParams(kind, a, b),
+    },
+    sound.muted,
+  );
+
+  simulator.setIntensity(INITIAL_INTENSITY);
+  simulator.start();
+}
+
+void main();
