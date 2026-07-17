@@ -75,12 +75,12 @@ before anything optional. Stories within an epic are not strictly ordered otherw
   - [x] README includes one working, copy-pasteable code example per constructor, each
         matching a real Godoc `Example` (so it can't silently drift from the API).
 
-- [ ] **3.3 Static deploy pipeline for the demo**
+- [x] **3.3 Static deploy pipeline for the demo**
   Wire `scripts/build-wasm.sh` into the site build so a single command produces a
   deployable artifact.
-  - [ ] `npm run build` in `site/` (after `scripts/build-wasm.sh`) produces `site/dist/`
+  - [x] `npm run build` in `site/` (after `scripts/build-wasm.sh`) produces `site/dist/`
         containing `spigot.wasm`, and no asset reference uses a leading `/` absolute path.
-  - [ ] The built `site/dist/` serves and runs correctly when opened via a static file
+  - [x] The built `site/dist/` serves and runs correctly when opened via a static file
         server rooted at a non-root subpath (simulating `apps.charliekrug.com/spigot`).
 
 - [ ] **3.4 Design polish pass — brand cohesion**
