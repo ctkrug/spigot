@@ -135,3 +135,16 @@ func TestLeakyBucketOutOfOrderTimeIsIgnored(t *testing.T) {
 		t.Fatal("expected rejection: queue full and no time elapsed")
 	}
 }
+
+func BenchmarkLeakyBucketAllow(b *testing.B) {
+	bucket, err := NewLeakyBucket(1e6, 1e6)
+	if err != nil {
+		b.Fatal(err)
+	}
+	start := time.Unix(0, 0)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		bucket.Allow(start)
+	}
+}
