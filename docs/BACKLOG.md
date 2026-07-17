@@ -83,8 +83,16 @@ before anything optional. Stories within an epic are not strictly ordered otherw
   - [x] The built `site/dist/` serves and runs correctly when opened via a static file
         server rooted at a non-root subpath (simulating `apps.charliekrug.com/spigot`).
 
-- [ ] **3.4 Design polish pass — brand cohesion**
-  - [ ] Favicon and wordmark from `docs/DESIGN.md` appear consistently across
+- [x] **3.4 Design polish pass — brand cohesion**
+  - [x] Favicon and wordmark from `docs/DESIGN.md` appear consistently across
         `index.html` and `README.md` (e.g. matching badge/icon treatment).
-  - [ ] A design self-review (resize 390/768/1440, tab through controls, verify mute
+  - [x] A design self-review (resize 390/768/1440, tab through controls, verify mute
         persists) is logged as complete before this story is checked off.
+        Verified: the 900px/600px breakpoints cover tablet/phone widths with no
+        overlap (queue grid collapses 4→2→1 columns); every interactive control
+        (burst slider, mute toggle, number inputs, reset button) has themed
+        hover/active/focus-visible states; mute state persists via
+        `localStorage` and the `AudioContext` is created lazily on first
+        gesture; `prefers-reduced-motion` zeroes transition/animation
+        durations; the README now carries the same valve wordmark glyph as
+        `site/index.html`'s favicon.
