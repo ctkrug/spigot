@@ -1,4 +1,6 @@
-# Spigot
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='40' height='40'%3E%3Crect width='32' height='32' rx='6' fill='%230b1f33'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%234fd1ff' stroke-width='2.5'/%3E%3Cline x1='16' y1='16' x2='22' y2='10' stroke='%23ff9d47' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%234fd1ff'/%3E%3C/svg%3E" width="40" height="40" alt="" align="left" />
+
+# SPIGOT
 
 A small, dependency-free Go rate-limiting library — token bucket, leaky bucket, sliding
 window, and fixed window — shipped with a live browser simulator so you can watch how each
