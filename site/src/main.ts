@@ -41,6 +41,11 @@ async function main(): Promise<void> {
         sound.playReject();
       }
     },
+    (results) => {
+      dashboard.flashBatch(results);
+      const admittedCount = results.filter((r) => r.admitted).length;
+      sound.playBatchFire(admittedCount, results.length);
+    },
   );
 
   const dashboard = new Dashboard(
@@ -51,6 +56,7 @@ async function main(): Promise<void> {
       onMuteToggle: () => sound.toggleMuted(),
       onReset: () => simulator.reset(),
       onParamChange: (kind, a, b) => simulator.setParams(kind, a, b),
+      onSendBatch: (n) => simulator.sendBatch(n),
     },
     sound.muted,
   );
