@@ -352,6 +352,43 @@ a {
   padding: var(--space-1);
 }
 
+.queue__batch {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-control);
+  padding: var(--space-1);
+}
+
+.queue__batch--accept {
+  color: var(--success);
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  animation: batch-pop var(--motion-ui) var(--ease-out);
+}
+
+.queue__batch--reject {
+  color: var(--danger);
+  background: rgba(255, 95, 109, 0.12);
+  border: 1px solid rgba(255, 95, 109, 0.4);
+  animation: batch-pop var(--motion-ui) var(--ease-out);
+}
+
+.queue__flash--batch {
+  animation-duration: 260ms;
+}
+
+@keyframes batch-pop {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 /* ---- Params grid ---- */
 
 .params {
@@ -428,7 +465,92 @@ a {
 
 .toolbar {
   display: flex;
-  justify-content: flex-end;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.batch-control {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--surface-1);
+  border: 1px solid rgba(79, 209, 255, 0.2);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+  padding: var(--space-2) var(--space-3);
+  flex: 1;
+  min-width: 280px;
+}
+
+.batch-control label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.batch-control input[type="number"] {
+  width: 6ch;
+  background: var(--surface-2);
+  border: 1px solid rgba(79, 209, 255, 0.25);
+  border-radius: var(--radius-control);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  padding: var(--space-1);
+  min-height: 44px;
+  transition: border-color var(--motion-ui) var(--ease-out), box-shadow var(--motion-ui) var(--ease-out);
+}
+
+.batch-control input[type="number"]:hover {
+  border-color: var(--accent);
+}
+
+.batch-control input[type="number"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+
+.batch-button {
+  background: var(--surface-2);
+  border: 1px solid rgba(79, 209, 255, 0.4);
+  color: var(--accent);
+  border-radius: var(--radius-control);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-height: 44px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--motion-ui) var(--ease-out), transform var(--motion-ui) var(--ease-out);
+}
+
+.batch-button:hover {
+  background: var(--surface-1);
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+
+.batch-button:active {
+  transform: scale(0.96);
+}
+
+.batch-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.batch-control__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
 }
 
 .reset-button {
@@ -479,6 +601,13 @@ a {
   }
   .burst-control {
     flex-wrap: wrap;
+  }
+  .batch-control {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+  .batch-control input[type="number"] {
+    width: 100%;
   }
 }
 
