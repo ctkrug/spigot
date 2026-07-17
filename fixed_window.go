@@ -48,6 +48,23 @@ func (w *FixedWindow) Allow(t time.Time) bool {
 	return true
 }
 
+// AllowN reports whether n requests arriving at t all fit within the
+// current window's remaining count at once. If they don't, none count.
+func (w *FixedWindow) AllowN(t time.Time, n int) bool {
+	if n <= 0 {
+		return true
+	}
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	w.advance(t)
+	if w.count+n > w.limit {
+		return false
+	}
+	w.count += n
+	return true
+}
+
 // Load reports the current window's count as a fraction of the limit.
 func (w *FixedWindow) Load() float64 {
 	w.mu.Lock()
