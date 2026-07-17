@@ -58,6 +58,13 @@ export interface QueueState {
   readonly error: string | null;
 }
 
+/** Outcome of firing a batch of n requests through AllowN at one instant. */
+export interface BatchResult {
+  readonly kind: AlgorithmKind;
+  readonly n: number;
+  readonly admitted: boolean;
+}
+
 function createLimiter(kind: AlgorithmKind, a: number, b: number): Limiter {
   switch (kind) {
     case "tokenBucket":
@@ -111,6 +118,7 @@ export class BurstSimulator {
   constructor(
     private readonly onTick: (states: readonly QueueState[]) => void,
     private readonly onRequest: (kind: AlgorithmKind, accepted: boolean) => void,
+    private readonly onBatch: (result: BatchResult) => void = () => {},
   ) {
     for (const meta of ALGORITHMS) {
       this.params.set(meta.kind, meta.defaultParams);
@@ -133,6 +141,34 @@ export class BurstSimulator {
     this.acc = 0;
     for (const meta of ALGORITHMS) {
       this.rebuild(meta.kind);
+    }
+    this.publish();
+  }
+
+  /**
+   * Fires a single all-or-nothing batch of n requests at the current
+   * simulated instant through AllowN, distinct from the steady per-request
+   * trickle the animation loop feeds via allow(). Demonstrates the atomic
+   * batch-admission guarantee: either all n count against capacity, or
+   * none do.
+   */
+  sendBatch(n: number): void {
+    if (n <= 0) {
+      return;
+    }
+    for (const [kind, limiter] of this.limiters) {
+      const state = this.states.get(kind);
+      if (!state) {
+        continue;
+      }
+      const admitted = limiter.allowN(this.simMs, n);
+      if (admitted) {
+        state.accepted += n;
+      } else {
+        state.rejected += n;
+      }
+      state.load = limiter.load();
+      this.onBatch({ kind, n, admitted });
     }
     this.publish();
   }
