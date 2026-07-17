@@ -58,7 +58,10 @@ func (w *FixedWindow) AllowN(t time.Time, n int) bool {
 	defer w.mu.Unlock()
 
 	w.advance(t)
-	if w.count+n > w.limit {
+	// Rearranged from "count+n > limit" so a large, caller-controlled n
+	// can't overflow int and wrap the sum into a false negative; count
+	// stays within [0, limit], so limit-count never overflows.
+	if n > w.limit-w.count {
 		return false
 	}
 	w.count += n
