@@ -21,6 +21,7 @@ declare global {
     spigotNewSlidingWindow(limit: number, windowMs: number): NewLimiterResult;
     spigotNewFixedWindow(limit: number, windowMs: number): NewLimiterResult;
     spigotAllow(id: number, tMs: number): boolean;
+    spigotAllowN(id: number, tMs: number, n: number): boolean;
     spigotLoad(id: number): number;
     spigotDispose(id: number): void;
   }
@@ -82,6 +83,14 @@ export class Limiter {
   /** Reports whether a request arriving at tMs (simulated milliseconds) is admitted. */
   allow(tMs: number): boolean {
     return window.spigotAllow(this.id, tMs);
+  }
+
+  /**
+   * Reports whether n requests arriving at once at tMs are all admitted.
+   * All-or-nothing: a rejection never partially consumes capacity.
+   */
+  allowN(tMs: number, n: number): boolean {
+    return window.spigotAllowN(this.id, tMs, n);
   }
 
   /** Current utilization in [0, 1]; 0 idle, 1 saturated. */
