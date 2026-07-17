@@ -23,7 +23,9 @@ moment sliding-window visibly smooths a burst that fixed-window lets straight th
 - **Sliding window** — weighted count across the previous and current window, no burst edge.
 - **Fixed window** — simplest counter-per-interval limiter, including its classic edge-burst flaw.
 - **Live simulator** — a TypeScript + WebAssembly demo page driving all four limiters against
-  the same synthetic traffic in real time.
+  the same synthetic traffic in real time, plus a "Fire batch (AllowN)" control that sends one
+  atomic batch to all four at once so you can see the all-or-nothing admission behavior, not
+  just read about it.
 - Zero third-party dependencies in the library itself.
 
 ## Stack
