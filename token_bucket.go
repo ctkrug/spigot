@@ -22,10 +22,10 @@ type TokenBucket struct {
 // burst size) and refillRate (tokens added per second). Both must be
 // positive; the bucket starts full.
 func NewTokenBucket(capacity, refillRate float64) (*TokenBucket, error) {
-	if capacity <= 0 {
+	if !(capacity > 0) {
 		return nil, fmt.Errorf("spigot: token bucket capacity must be positive, got %v", capacity)
 	}
-	if refillRate <= 0 {
+	if !(refillRate > 0) {
 		return nil, fmt.Errorf("spigot: token bucket refill rate must be positive, got %v", refillRate)
 	}
 	return &TokenBucket{
