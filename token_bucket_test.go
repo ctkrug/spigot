@@ -137,3 +137,16 @@ func TestTokenBucketOutOfOrderTimeIsIgnored(t *testing.T) {
 		t.Fatal("expected rejection: no tokens available and no time elapsed")
 	}
 }
+
+func BenchmarkTokenBucketAllow(b *testing.B) {
+	bucket, err := NewTokenBucket(1e6, 1e6)
+	if err != nil {
+		b.Fatal(err)
+	}
+	start := time.Unix(0, 0)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		bucket.Allow(start)
+	}
+}
