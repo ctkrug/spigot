@@ -74,6 +74,15 @@ limiter, err := spigot.NewSlidingWindow(20, 2*time.Second)
 limiter, err := spigot.NewFixedWindow(20, 2*time.Second)
 ```
 
+Every limiter also implements `BulkLimiter.AllowN(t time.Time, n int) bool` for batch
+admission — either all `n` requests are admitted, or none are (no partial consumption):
+
+```go
+if limiter.AllowN(time.Now(), 5) {
+    // admit all 5 requests in the batch
+}
+```
+
 ## Running the demo locally
 
 ```sh
