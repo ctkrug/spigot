@@ -35,8 +35,9 @@ export const ALGORITHMS: readonly AlgorithmMeta[] = [
     paramLabels: ["Limit (req/window)", "Window (ms)"],
     defaultParams: [20, 2000],
     description:
-      "Weights the previous window's count into the current one, so a burst that " +
-      "straddles a window boundary is smoothed instead of reset away.",
+      "Blends a weighted share of the previous window's count into the current one " +
+      "as time moves through it, rather than resetting to zero at the boundary. " +
+      "A burst that straddles the edge gets smoothed down instead of slipping through twice.",
   },
   {
     kind: "fixedWindow",
