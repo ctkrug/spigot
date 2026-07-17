@@ -49,6 +49,23 @@ func (b *TokenBucket) Allow(t time.Time) bool {
 	return true
 }
 
+// AllowN reports whether n requests arriving at t are all admitted at
+// once. If fewer than n tokens are available, none are consumed.
+func (b *TokenBucket) AllowN(t time.Time, n int) bool {
+	if n <= 0 {
+		return true
+	}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	b.refill(t)
+	if b.tokens < float64(n) {
+		return false
+	}
+	b.tokens -= float64(n)
+	return true
+}
+
 // Load reports how drained the bucket is: 0 when full, 1 when empty.
 func (b *TokenBucket) Load() float64 {
 	b.mu.Lock()
