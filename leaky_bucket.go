@@ -24,10 +24,10 @@ type LeakyBucket struct {
 // queued requests) and leakRate (requests drained per second). Both must
 // be positive; the bucket starts empty.
 func NewLeakyBucket(capacity, leakRate float64) (*LeakyBucket, error) {
-	if capacity <= 0 {
+	if !(capacity > 0) {
 		return nil, fmt.Errorf("spigot: leaky bucket capacity must be positive, got %v", capacity)
 	}
-	if leakRate <= 0 {
+	if !(leakRate > 0) {
 		return nil, fmt.Errorf("spigot: leaky bucket leak rate must be positive, got %v", leakRate)
 	}
 	return &LeakyBucket{capacity: capacity, leakRate: leakRate}, nil
