@@ -171,7 +171,13 @@ export class BurstSimulator {
       state.load = limiter.load();
       results.push({ kind, n, admitted });
     }
-    this.onBatch(results);
+    // Skip the callback entirely if every algorithm currently has invalid
+    // params (limiters empty): there's nothing to flash or play a sound
+    // for, and an empty-results call would otherwise read as "mostly
+    // rejected" to a naive admitted/total ratio.
+    if (results.length > 0) {
+      this.onBatch(results);
+    }
     this.publish();
   }
 
