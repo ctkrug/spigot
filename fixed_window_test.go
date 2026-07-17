@@ -1,6 +1,7 @@
 package spigot
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -139,6 +140,29 @@ func TestFixedWindowAllowN(t *testing.T) {
 				t.Fatalf("count after AllowN(%d) = %v, want %v", tt.n, got, tt.wantCount)
 			}
 		})
+	}
+}
+
+// TestFixedWindowAllowNRejectsOverflowingBatch guards against a client
+// choosing n so that count+n wraps around int's range instead of
+// legitimately exceeding the limit -- a batch size an adversarial caller
+// fully controls.
+func TestFixedWindowAllowNRejectsOverflowingBatch(t *testing.T) {
+	w, err := NewFixedWindow(10, time.Second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	start := time.Unix(0, 0)
+	if !w.AllowN(start, 5) {
+		t.Fatal("expected AllowN(5) against a limit of 10 to succeed")
+	}
+
+	n := math.MaxInt - 4 // count(5) + n overflows int if computed directly
+	if w.AllowN(start, n) {
+		t.Fatalf("AllowN(%d) against a limit of 10 with count 5 must be rejected, not admitted via overflow", n)
+	}
+	if w.count != 5 {
+		t.Fatalf("count after rejected AllowN(%d) = %d, want unchanged at 5", n, w.count)
 	}
 }
 
