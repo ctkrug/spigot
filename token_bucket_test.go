@@ -1,6 +1,7 @@
 package spigot
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -17,6 +18,8 @@ func TestNewTokenBucketValidation(t *testing.T) {
 		{"negative capacity", -1, 1, true},
 		{"zero refill rate", 10, 0, true},
 		{"negative refill rate", 10, -1, true},
+		{"NaN capacity", math.NaN(), 1, true},
+		{"NaN refill rate", 10, math.NaN(), true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
