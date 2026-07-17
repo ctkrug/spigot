@@ -158,3 +158,16 @@ func TestSlidingWindowLongGapResetsWeight(t *testing.T) {
 		t.Fatal("expected admit after a long idle gap resets the window weight")
 	}
 }
+
+func BenchmarkSlidingWindowAllow(b *testing.B) {
+	w, err := NewSlidingWindow(1e6, time.Hour)
+	if err != nil {
+		b.Fatal(err)
+	}
+	start := time.Unix(0, 0)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		w.Allow(start)
+	}
+}
