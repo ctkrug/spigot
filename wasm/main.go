@@ -82,6 +82,20 @@ func main() {
 		return e.limiter.Allow(time.UnixMilli(int64(tMs)))
 	}))
 
+	js.Global().Set("spigotAllowN", js.FuncOf(func(this js.Value, args []js.Value) any {
+		e, ok := lookup(args[0].Int())
+		if !ok {
+			return false
+		}
+		bulk, ok := e.limiter.(spigot.BulkLimiter)
+		if !ok {
+			return false
+		}
+		tMs := args[1].Float()
+		n := args[2].Int()
+		return bulk.AllowN(time.UnixMilli(int64(tMs)), n)
+	}))
+
 	js.Global().Set("spigotLoad", js.FuncOf(func(this js.Value, args []js.Value) any {
 		e, ok := lookup(args[0].Int())
 		if !ok || e.loader == nil {
