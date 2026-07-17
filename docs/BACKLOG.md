@@ -42,12 +42,12 @@ before anything optional. Stories within an epic are not strictly ordered otherw
   - [x] Zero or negative capacity/rate/window returns a non-nil `error`, never a panic.
   - [x] Each constructor has a runnable Godoc `Example` that passes under `go test`.
 
-- [ ] **2.2 Bulk-request support (`AllowN`)**
+- [x] **2.2 Bulk-request support (`AllowN`)**
   Extend the API so callers can ask "would N requests be admitted right now" in one call,
   which real-world batch endpoints need.
-  - [ ] `AllowN(t, 5)` against a bucket holding 3 available tokens returns `false` and
+  - [x] `AllowN(t, 5)` against a bucket holding 3 available tokens returns `false` and
         consumes zero tokens (no partial consumption on rejection).
-  - [ ] Table-driven `AllowN` tests exist for all four algorithms.
+  - [x] Table-driven `AllowN` tests exist for all four algorithms.
 
 - [ ] **2.3 Concurrency-safety test suite**
   Every limiter must be safe under concurrent `Allow` calls from multiple goroutines.
