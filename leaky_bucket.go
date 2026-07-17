@@ -47,6 +47,23 @@ func (b *LeakyBucket) Allow(t time.Time) bool {
 	return true
 }
 
+// AllowN reports whether n requests arriving at t all fit in the queue
+// at once. If there isn't room for all n, none are queued.
+func (b *LeakyBucket) AllowN(t time.Time, n int) bool {
+	if n <= 0 {
+		return true
+	}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	b.leak(t)
+	if b.level+float64(n) > b.capacity {
+		return false
+	}
+	b.level += float64(n)
+	return true
+}
+
 // Load reports how full the queue is: 0 when empty, 1 when at capacity.
 func (b *LeakyBucket) Load() float64 {
 	b.mu.Lock()
