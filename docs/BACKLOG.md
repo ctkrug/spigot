@@ -65,11 +65,11 @@ before anything optional. Stories within an epic are not strictly ordered otherw
 
 ## Epic 3 — Demo & docs polish
 
-- [ ] **3.1 Algorithm explainer copy**
+- [x] **3.1 Algorithm explainer copy**
   Each algorithm gets real, specific explanatory copy on the demo page — not filler.
-  - [ ] All four algorithms have a 2–3 sentence plain-English explanation visible on the
+  - [x] All four algorithms have a 2–3 sentence plain-English explanation visible on the
         page, naming their actual trade-off (e.g. fixed window's boundary-burst flaw).
-  - [ ] No placeholder/lorem-ipsum text ships.
+  - [x] No placeholder/lorem-ipsum text ships.
 
 - [ ] **3.2 README usage examples**
   - [ ] README includes one working, copy-pasteable code example per constructor, each
