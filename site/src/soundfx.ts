@@ -13,13 +13,33 @@ interface ToneOptions {
   gain: number;
 }
 
+// localStorage can throw on access (not just on quota) in some
+// private-browsing modes and under strict storage/cookie policies. Muting
+// is a nice-to-have preference, not something worth a blank page over, so
+// every access degrades to an in-memory default instead of propagating.
+function readMutedPreference(): boolean {
+  try {
+    return window.localStorage.getItem(MUTE_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeMutedPreference(muted: boolean): void {
+  try {
+    window.localStorage.setItem(MUTE_STORAGE_KEY, muted ? "1" : "0");
+  } catch {
+    // Preference just won't persist across reloads in this environment.
+  }
+}
+
 export class SoundEngine {
   private ctx: AudioContext | null = null;
   private lastPlayedAtMs = 0;
   private mutedState: boolean;
 
   constructor() {
-    this.mutedState = window.localStorage.getItem(MUTE_STORAGE_KEY) === "1";
+    this.mutedState = readMutedPreference();
   }
 
   get muted(): boolean {
@@ -28,7 +48,7 @@ export class SoundEngine {
 
   setMuted(muted: boolean): void {
     this.mutedState = muted;
-    window.localStorage.setItem(MUTE_STORAGE_KEY, muted ? "1" : "0");
+    writeMutedPreference(muted);
   }
 
   toggleMuted(): boolean {
