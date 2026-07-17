@@ -118,7 +118,7 @@ export class BurstSimulator {
   constructor(
     private readonly onTick: (states: readonly QueueState[]) => void,
     private readonly onRequest: (kind: AlgorithmKind, accepted: boolean) => void,
-    private readonly onBatch: (result: BatchResult) => void = () => {},
+    private readonly onBatch: (results: readonly BatchResult[]) => void = () => {},
   ) {
     for (const meta of ALGORITHMS) {
       this.params.set(meta.kind, meta.defaultParams);
@@ -156,6 +156,7 @@ export class BurstSimulator {
     if (n <= 0) {
       return;
     }
+    const results: BatchResult[] = [];
     for (const [kind, limiter] of this.limiters) {
       const state = this.states.get(kind);
       if (!state) {
@@ -168,8 +169,9 @@ export class BurstSimulator {
         state.rejected += n;
       }
       state.load = limiter.load();
-      this.onBatch({ kind, n, admitted });
+      results.push({ kind, n, admitted });
     }
+    this.onBatch(results);
     this.publish();
   }
 
