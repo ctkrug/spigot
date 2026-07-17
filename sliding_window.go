@@ -95,6 +95,10 @@ func (w *SlidingWindow) estimate(t time.Time) float64 {
 	frac := t.Sub(w.currStart).Seconds() / w.window.Seconds()
 	switch {
 	case frac > 1:
+		// Defensive only: advance(t) always runs before estimate(t) in every
+		// call path, and its loop guarantees t stays inside [currStart,
+		// currStart+window), i.e. frac < 1. Kept in case that invariant is
+		// ever broken by a future caller.
 		frac = 1
 	case frac < 0:
 		frac = 0
