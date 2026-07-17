@@ -187,9 +187,7 @@ export class Dashboard {
     resetButton.addEventListener("click", () => {
       this.callbacks.onReset();
       for (const refs of this.queueRefs.values()) {
-        refs.batch.hidden = true;
-        refs.batch.textContent = "";
-        refs.batch.classList.remove("queue__batch--accept", "queue__batch--reject");
+        this.clearBatchDisplay(refs);
       }
     });
 
@@ -212,10 +210,19 @@ export class Dashboard {
     for (const [kind, refs] of this.queueRefs) {
       const handleChange = (): void => {
         this.callbacks.onParamChange(kind, refs.fieldA.valueAsNumber, refs.fieldB.valueAsNumber);
+        // The limiter behind this queue was just rebuilt from scratch, so
+        // any previously-fired batch verdict no longer describes it.
+        this.clearBatchDisplay(refs);
       };
       refs.fieldA.addEventListener("change", handleChange);
       refs.fieldB.addEventListener("change", handleChange);
     }
+  }
+
+  private clearBatchDisplay(refs: QueueRefs): void {
+    refs.batch.hidden = true;
+    refs.batch.textContent = "";
+    refs.batch.classList.remove("queue__batch--accept", "queue__batch--reject");
   }
 
   private setIntensityDisplay(value: number): void {
