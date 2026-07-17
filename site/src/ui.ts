@@ -28,6 +28,11 @@ interface QueueMemory {
 }
 
 const DRAIN_GLOW_MS = 700;
+// Comfortably above any realistic capacity/limit in the demo (so a max
+// batch always demonstrates a clean rejection) while staying far inside
+// the safe-integer range the wasm boundary's float64->int conversion
+// can round-trip without surprises.
+const MAX_BATCH_SIZE = 1_000_000;
 
 function queueTemplate(meta: AlgorithmMeta): string {
   return `
@@ -98,7 +103,7 @@ function shellTemplate(): string {
     <div class="toolbar">
       <div class="batch-control">
         <label for="batch-size">Batch size</label>
-        <input type="number" id="batch-size" min="1" step="1" value="15" aria-describedby="batch-hint" />
+        <input type="number" id="batch-size" min="1" max="1000000" step="1" value="15" aria-describedby="batch-hint" />
         <button type="button" class="batch-button" id="batch-button">Fire batch (AllowN)</button>
         <p class="batch-control__hint" id="batch-hint">
           Sends one atomic AllowN request to all four limiters at the same instant --
@@ -192,7 +197,7 @@ export class Dashboard {
     const batchButton = required(root.querySelector<HTMLButtonElement>("#batch-button"), "#batch-button");
     const fireBatch = (): void => {
       const raw = batchInput.valueAsNumber;
-      const n = Number.isFinite(raw) ? Math.max(1, Math.round(raw)) : 1;
+      const n = Number.isFinite(raw) ? Math.min(MAX_BATCH_SIZE, Math.max(1, Math.round(raw))) : 1;
       batchInput.value = String(n);
       this.callbacks.onSendBatch(n);
     };
