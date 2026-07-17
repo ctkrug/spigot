@@ -47,6 +47,13 @@ and running accept/reject counters. On desktop (1440×900) the simulator occupie
 stack vertically in a single scrollable column, with the burst slider pinned above them so
 it's always reachable while scrolling through queues.
 
+Directly below the queues, a toolbar row pairs the batch-admission control (batch-size input
++ "Fire batch (AllowN)" button, cyan-accented as a primary action) with the amber reset
+button — the two atomic simulator actions live side by side, reset undoing state and batch
+adding it in one atomic step. Each queue shows the outcome as a persistent pill ("batch of N:
+admitted/rejected") so AllowN's all-or-nothing guarantee is something you *see* differ across
+algorithms, not just something the README claims.
+
 ## Signature detail
 
 The **SPIGOT** wordmark includes a small inline SVG valve/gauge glyph that visibly rotates
@@ -61,13 +68,20 @@ built with a CSS custom property bound to the slider value, no JS animation loop
   rejected request flashes the bar edge `--danger` red and gives it a 2px, 80ms shake.
 - **Goal feedback:** when a queue fully drains after a burst with zero drops, it gets a soft
   green glow pulse — the visible "this algorithm absorbed it cleanly" moment.
+- **Batch feedback:** firing a batch gives every queue a longer (260ms), full-track flash plus
+  a persistent success/danger pill naming the outcome — visually distinct from the steady
+  per-request flashes so a deliberate batch reads as a distinct event, not more traffic noise.
 - **Sound (WebAudio, synthesized, no audio files):**
   - Accept: short sine blip, ~800Hz, 40ms, low gain.
   - Reject: short low sawtooth/noise thunk, ~150Hz, 60ms.
   - Burst-slider release: a quick ascending two-note chirp.
-  - All SFX rate-throttled (max ~10/sec) so a heavy burst doesn't turn into noise. A mute
-    toggle persists in `localStorage`; the `AudioContext` is created lazily on first user
-    gesture and every call site guards for its absence (tests, unsupported environments).
+  - Batch fire: an unthrottled cue pitched by outcome — ascending pair when most algorithms
+    admit the batch, a low sawtooth thunk when most reject it.
+  - All per-request SFX rate-throttled (max ~10/sec) so a heavy burst doesn't turn into noise;
+    the batch-fire cue is exempt since it's one deliberate action. A mute toggle persists in
+    `localStorage` (degrading to an in-memory default if storage access is blocked); the
+    `AudioContext` is created lazily on first user gesture and every call site guards for its
+    absence (tests, unsupported environments).
 - Respects `prefers-reduced-motion`: fill/drain keeps functioning instantly (no tween) and
   shake/glow/particle-style effects are dropped; sound is unaffected (it's not motion).
 
