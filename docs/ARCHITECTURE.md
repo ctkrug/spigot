@@ -8,13 +8,15 @@ no parallel JavaScript reimplementation of any algorithm.
 
 ```
 spigot/
-  limiter.go              # Limiter interface: Allow(t time.Time) bool
+  limiter.go              # Limiter: Allow(t time.Time) bool; BulkLimiter: AllowN(t, n) bool
   loader.go               # Loader interface: Load() float64 (utilization, for visualization)
-  token_bucket.go          # TokenBucket + NewTokenBucket
-  leaky_bucket.go          # LeakyBucket + NewLeakyBucket
-  sliding_window.go        # SlidingWindow + NewSlidingWindow (weighted two-window estimate)
-  fixed_window.go          # FixedWindow + NewFixedWindow (naive per-interval counter)
-  *_test.go                # table-driven tests per algorithm: steady-state, burst, boundary
+  token_bucket.go          # TokenBucket + NewTokenBucket, AllowN
+  leaky_bucket.go          # LeakyBucket + NewLeakyBucket, AllowN
+  sliding_window.go        # SlidingWindow + NewSlidingWindow (weighted two-window estimate), AllowN
+  fixed_window.go          # FixedWindow + NewFixedWindow (naive per-interval counter), AllowN
+  *_test.go                # table-driven tests per algorithm: steady-state, burst, boundary, AllowN
+  *_example_test.go        # runnable Godoc Example per constructor (mirrors the README snippets)
+  concurrency_test.go      # race tests: N goroutines hammering Allow/AllowN never exceed capacity
   doc.go                   # package doc comment
 
   wasm/main.go              # GOOS=js GOARCH=wasm entrypoint; registers JS globals
@@ -64,6 +66,9 @@ spigot/
 ## Running it
 
 - Library: `go test ./...` (add `-race` to match CI).
+- Benchmarks: `go test -bench=. -benchmem ./...` — steady-state `Allow` is zero-alloc on all
+  four limiters (see `Benchmark*Allow` in each `*_test.go`).
 - Wasm cross-compile: `bash scripts/build-wasm.sh` (or `make build-wasm`).
 - Site dev server: `make site-dev` (builds wasm first, then `vite`).
-- Site production build: `make site-build` → `site/dist/`.
+- Site production build: `make site-build` → `site/dist/` (verified servable from a
+  non-root subpath — every asset path is relative).
