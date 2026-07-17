@@ -49,11 +49,11 @@ before anything optional. Stories within an epic are not strictly ordered otherw
         consumes zero tokens (no partial consumption on rejection).
   - [x] Table-driven `AllowN` tests exist for all four algorithms.
 
-- [ ] **2.3 Concurrency-safety test suite**
+- [x] **2.3 Concurrency-safety test suite**
   Every limiter must be safe under concurrent `Allow` calls from multiple goroutines.
-  - [ ] `go test -race` passes with a test that hammers each limiter from ≥50 concurrent
+  - [x] `go test -race` passes with a test that hammers each limiter from ≥50 concurrent
         goroutines.
-  - [ ] No limiter ever admits more than its configured capacity within one window under
+  - [x] No limiter ever admits more than its configured capacity within one window under
         concurrent load (assertable via a counting test).
 
 - [ ] **2.4 Benchmark suite**
