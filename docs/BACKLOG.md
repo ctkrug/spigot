@@ -5,34 +5,34 @@ before anything optional. Stories within an epic are not strictly ordered otherw
 
 ## Epic 1 — Live burst simulator (the wow moment)
 
-- [ ] **1.1 Build the four-algorithm burst simulator**
+- [x] **1.1 Build the four-algorithm burst simulator**
   Implement token bucket, leaky bucket, sliding window, and fixed window as `Limiter`
   implementations in Go (each in its own file, table-driven tests covering steady-state,
   burst, and boundary edge cases). Compile the library to WASM and wire it into `site/` via
   `wasm_exec.js`. Build a page with a burst-intensity slider that feeds identical synthetic
   request timing into all four limiters simultaneously, rendering four queues that visibly
   fill and drain in real time.
-  - [ ] Dragging the burst slider from min to max produces visibly different fill/drain
+  - [x] Dragging the burst slider from min to max produces visibly different fill/drain
         behavior across all four algorithms within the same run.
-  - [ ] A burst that spans a window boundary is visibly admitted in full by fixed window and
+  - [x] A burst that spans a window boundary is visibly admitted in full by fixed window and
         visibly smoothed by sliding window (the core comparison).
-  - [ ] `go test ./...` passes, and the demo runs entirely client-side after the initial
+  - [x] `go test ./...` passes, and the demo runs entirely client-side after the initial
         WASM fetch (no further network calls during simulation).
 
-- [ ] **1.2 Add per-algorithm parameter controls**
+- [x] **1.2 Add per-algorithm parameter controls**
   Expose capacity / refill-rate / window-size as adjustable inputs per algorithm so the
   comparison isn't locked to one preset configuration.
-  - [ ] Changing token bucket capacity in the UI changes its burst-absorption behavior on
+  - [x] Changing token bucket capacity in the UI changes its burst-absorption behavior on
         the next simulated run.
-  - [ ] Entering a zero or negative capacity/rate shows an inline validation error, not a
+  - [x] Entering a zero or negative capacity/rate shows an inline validation error, not a
         crash or a silently-ignored value.
 
-- [ ] **1.3 Design polish pass on the simulator**
+- [x] **1.3 Design polish pass on the simulator**
   Apply `docs/DESIGN.md`'s blueprint/technical direction and tokens: themed slider/inputs,
   tweened queue fill/drain, accept/reject flash feedback, the rotating-valve wordmark.
-  - [ ] Simulator page uses the tokens from `docs/DESIGN.md` (fonts, palette) with no
+  - [x] Simulator page uses the tokens from `docs/DESIGN.md` (fonts, palette) with no
         unstyled native form controls.
-  - [ ] Page is usable with no horizontal scroll and no overlapping elements at 390px width.
+  - [x] Page is usable with no horizontal scroll and no overlapping elements at 390px width.
 
 ## Epic 2 — Library completeness & API polish
 
