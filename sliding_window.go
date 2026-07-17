@@ -49,6 +49,24 @@ func (w *SlidingWindow) Allow(t time.Time) bool {
 	return true
 }
 
+// AllowN reports whether n requests arriving at t are all admitted under
+// the weighted estimate at once. If the estimate plus n would exceed the
+// limit, none are counted.
+func (w *SlidingWindow) AllowN(t time.Time, n int) bool {
+	if n <= 0 {
+		return true
+	}
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	w.advance(t)
+	if w.estimate(t)+float64(n) > float64(w.limit) {
+		return false
+	}
+	w.currCount += n
+	return true
+}
+
 // Load reports the weighted estimate as a fraction of the limit.
 func (w *SlidingWindow) Load() float64 {
 	w.mu.Lock()
