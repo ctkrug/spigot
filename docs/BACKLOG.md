@@ -71,8 +71,8 @@ before anything optional. Stories within an epic are not strictly ordered otherw
         page, naming their actual trade-off (e.g. fixed window's boundary-burst flaw).
   - [x] No placeholder/lorem-ipsum text ships.
 
-- [ ] **3.2 README usage examples**
-  - [ ] README includes one working, copy-pasteable code example per constructor, each
+- [x] **3.2 README usage examples**
+  - [x] README includes one working, copy-pasteable code example per constructor, each
         matching a real Godoc `Example` (so it can't silently drift from the API).
 
 - [ ] **3.3 Static deploy pipeline for the demo**
