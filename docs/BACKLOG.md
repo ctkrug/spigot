@@ -36,11 +36,11 @@ before anything optional. Stories within an epic are not strictly ordered otherw
 
 ## Epic 2 — Library completeness & API polish
 
-- [ ] **2.1 Constructors with validation for each limiter**
+- [x] **2.1 Constructors with validation for each limiter**
   Add `NewTokenBucket`, `NewLeakyBucket`, `NewSlidingWindow`, `NewFixedWindow` constructors
   that validate their arguments instead of allowing an unusable zero-value limiter.
-  - [ ] Zero or negative capacity/rate/window returns a non-nil `error`, never a panic.
-  - [ ] Each constructor has a runnable Godoc `Example` that passes under `go test`.
+  - [x] Zero or negative capacity/rate/window returns a non-nil `error`, never a panic.
+  - [x] Each constructor has a runnable Godoc `Example` that passes under `go test`.
 
 - [ ] **2.2 Bulk-request support (`AllowN`)**
   Extend the API so callers can ask "would N requests be admitted right now" in one call,
