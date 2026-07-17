@@ -56,11 +56,11 @@ before anything optional. Stories within an epic are not strictly ordered otherw
   - [x] No limiter ever admits more than its configured capacity within one window under
         concurrent load (assertable via a counting test).
 
-- [ ] **2.4 Benchmark suite**
+- [x] **2.4 Benchmark suite**
   Establish a performance baseline so a future change can be checked against it.
-  - [ ] `go test -bench=. -benchmem` reports ns/op and allocs/op for `Allow` on all four
+  - [x] `go test -bench=. -benchmem` reports ns/op and allocs/op for `Allow` on all four
         limiters.
-  - [ ] The steady-state (non-boundary) `Allow` path allocates zero bytes per call for at
+  - [x] The steady-state (non-boundary) `Allow` path allocates zero bytes per call for at
         least token bucket and leaky bucket.
 
 ## Epic 3 — Demo & docs polish
