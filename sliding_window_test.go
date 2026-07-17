@@ -113,6 +113,36 @@ func TestSlidingWindowLoadReflectsUsage(t *testing.T) {
 	}
 }
 
+func TestSlidingWindowAllowN(t *testing.T) {
+	tests := []struct {
+		name      string
+		n         int
+		wantAllow bool
+		wantCount int
+	}{
+		{"exactly fits", 3, true, 3},
+		{"more than fits", 4, false, 0},
+		{"fewer than fits", 2, true, 2},
+		{"zero always admitted", 0, true, 0},
+		{"negative always admitted", -1, true, 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w, err := NewSlidingWindow(3, time.Second)
+			if err != nil {
+				t.Fatal(err)
+			}
+			start := time.Unix(0, 0)
+			if got := w.AllowN(start, tt.n); got != tt.wantAllow {
+				t.Fatalf("AllowN(%d) = %v, want %v", tt.n, got, tt.wantAllow)
+			}
+			if got := w.currCount; got != tt.wantCount {
+				t.Fatalf("currCount after AllowN(%d) = %v, want %v", tt.n, got, tt.wantCount)
+			}
+		})
+	}
+}
+
 func TestSlidingWindowLongGapResetsWeight(t *testing.T) {
 	w, err := NewSlidingWindow(2, time.Second)
 	if err != nil {
