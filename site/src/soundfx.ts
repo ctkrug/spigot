@@ -60,6 +60,32 @@ export class SoundEngine {
     this.tone(ctx, now + 0.08, { freq: 900, type: "sine", duration: 0.1, gain: 0.05 });
   }
 
+  /**
+   * Feedback for firing a batch (AllowN) across all algorithms at once;
+   * never throttled since it's a single deliberate user action, not a
+   * high-frequency stream. Pitches up when most algorithms admitted the
+   * batch, down when most rejected it.
+   */
+  playBatchFire(admittedCount: number, total: number): void {
+    if (this.mutedState) {
+      return;
+    }
+    const ctx = this.ensureContext();
+    if (!ctx) {
+      return;
+    }
+    const ratio = total > 0 ? admittedCount / total : 0;
+    const now = ctx.currentTime;
+    if (ratio >= 0.75) {
+      this.tone(ctx, now, { freq: 600, type: "sine", duration: 0.06, gain: 0.06 });
+      this.tone(ctx, now + 0.06, { freq: 1000, type: "sine", duration: 0.09, gain: 0.06 });
+    } else if (ratio <= 0.25) {
+      this.tone(ctx, now, { freq: 220, type: "sawtooth", duration: 0.1, gain: 0.06 });
+    } else {
+      this.tone(ctx, now, { freq: 450, type: "triangle", duration: 0.08, gain: 0.05 });
+    }
+  }
+
   private playThrottled(opts: ToneOptions): void {
     if (this.mutedState) {
       return;
