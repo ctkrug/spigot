@@ -94,6 +94,36 @@ func TestTokenBucketLoadReflectsUsage(t *testing.T) {
 	}
 }
 
+func TestTokenBucketAllowN(t *testing.T) {
+	tests := []struct {
+		name       string
+		n          int
+		wantAllow  bool
+		wantTokens float64
+	}{
+		{"exactly available", 5, true, 0},
+		{"more than available", 6, false, 5},
+		{"fewer than available", 3, true, 2},
+		{"zero always admitted", 0, true, 5},
+		{"negative always admitted", -1, true, 5},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := NewTokenBucket(5, 1)
+			if err != nil {
+				t.Fatal(err)
+			}
+			start := time.Unix(0, 0)
+			if got := b.AllowN(start, tt.n); got != tt.wantAllow {
+				t.Fatalf("AllowN(%d) = %v, want %v", tt.n, got, tt.wantAllow)
+			}
+			if got := b.tokens; got != tt.wantTokens {
+				t.Fatalf("tokens after AllowN(%d) = %v, want %v", tt.n, got, tt.wantTokens)
+			}
+		})
+	}
+}
+
 func TestTokenBucketOutOfOrderTimeIsIgnored(t *testing.T) {
 	b, err := NewTokenBucket(1, 1)
 	if err != nil {
