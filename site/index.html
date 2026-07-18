@@ -32,5 +32,75 @@
   </head>
   <body>
     <div id="app"></div>
+    <main class="explainer">
+      <section class="explainer__block">
+        <h2>Which rate limiting algorithm should you use?</h2>
+        <p>
+          The four common rate limiters accept and reject traffic differently, and the gap
+          only shows up under a burst. The simulator above runs all four against the same
+          synthetic burst so you can compare them directly. Here is the short version of what
+          you are watching, and how to choose.
+        </p>
+        <p>
+          A <strong>token bucket</strong> starts with a full bucket of tokens and spends one
+          per request, refilling at a steady rate. It admits a burst instantly up to its
+          capacity, then throttles to the refill rate, which makes it the usual default for
+          public APIs that want to tolerate short spikes. A <strong>leaky bucket</strong>
+          instead queues requests and drains them at a fixed rate, so its output is perfectly
+          smooth no matter how spiky the input is, at the cost of added latency while the queue
+          drains. That is the core token bucket vs leaky bucket trade: burst tolerance versus a
+          strictly constant output rate.
+        </p>
+        <p>
+          The two window algorithms count requests per time interval. A <strong>fixed
+          window</strong> resets its counter at every boundary, which is simple but lets up to
+          twice the limit through when a burst straddles the reset instant. A <strong>sliding
+          window</strong> fixes that edge by blending a weighted share of the previous window's
+          count into the current one, smoothing the boundary burst that fixed window lets slip.
+          Drag the burst slider and you can watch fixed window admit that double burst while
+          sliding window holds the line.
+        </p>
+      </section>
+
+      <section class="explainer__block" aria-labelledby="faq-heading">
+        <h2 id="faq-heading">Rate limiting algorithm comparison: FAQ</h2>
+        <dl class="faq">
+          <dt>Token bucket vs leaky bucket: what is the difference?</dt>
+          <dd>
+            Token bucket lets a burst through instantly up to its capacity, then limits to the
+            refill rate. Leaky bucket queues everything and releases at one constant rate, so it
+            never bursts but adds queueing delay. Pick token bucket when short spikes are fine,
+            leaky bucket when downstream needs a steady, predictable flow.
+          </dd>
+          <dt>How does a sliding window rate limiter work?</dt>
+          <dd>
+            A sliding window rate limiter estimates the request count over the trailing window
+            by taking the current window's count plus a fraction of the previous window's,
+            weighted by how far you are past the boundary. That weighting is what removes the
+            boundary burst a fixed window suffers, without storing a full timestamp log per
+            client.
+          </dd>
+          <dt>Why does a fixed window rate limiter let bursts through?</dt>
+          <dd>
+            Because it resets the counter to zero at each boundary. A client can send the full
+            limit just before the reset and the full limit again just after, landing up to
+            double the limit in a short span. The simulator shows this as a fixed window burst
+            that sliding window smooths away.
+          </dd>
+          <dt>Which rate limiting algorithm is best?</dt>
+          <dd>
+            There is no single best one. Token bucket is the common default for APIs, leaky
+            bucket suits strict constant-rate needs, sliding window is the accurate choice when
+            boundary bursts matter, and fixed window is fine when simplicity beats precision.
+            The point of this comparison is to see the trade-off before you commit.
+          </dd>
+        </dl>
+      </section>
+
+      <footer class="site-footer">
+        <a class="site-footer__cta" href="https://github.com/ctkrug/spigot">View Spigot on GitHub</a>
+        <a class="site-footer__portfolio" href="https://apps.charliekrug.com">More by Charlie Krug &rarr; apps.charliekrug.com</a>
+      </footer>
+    </main>
   </body>
 </html>
