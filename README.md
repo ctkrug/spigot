@@ -2,27 +2,33 @@
 
 # SPIGOT
 
-A small, dependency-free Go rate-limiting library — token bucket, leaky bucket, sliding
-window, and fixed window — shipped with a live browser simulator so you can watch how each
-algorithm actually behaves under a burst before you pick one.
+**▶ Live demo — [apps.charliekrug.com/spigot](https://apps.charliekrug.com/spigot/)**
+
+*See token bucket vs leaky bucket, live.* A dependency-free Go rate-limiting library that
+compiles to WebAssembly and drives a browser simulator, so you can watch all four common
+algorithms handle the same burst side by side before you pick one.
+
+[![CI](https://github.com/ctkrug/spigot/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/spigot/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/ctkrug/spigot.svg)](https://pkg.go.dev/github.com/ctkrug/spigot)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Why
 
 Every rate limiter README tells you which algorithm to use in prose. None of them let you
 *see* it. Spigot compiles its own Go implementation to WebAssembly and drives a live
-simulator with it, so the demo isn't a reimplementation that might drift from the library —
-it's the exact same code deciding, in real time, which requests get through.
+simulator with it, so the demo isn't a reimplementation that might drift from the library.
+It's the exact same code deciding, in real time, which requests get through.
 
 Drag the burst-traffic slider and watch four queues fill and drain side by side. That's the
-moment sliding-window visibly smooths a burst that fixed-window lets straight through.
+moment sliding window visibly smooths a burst that fixed window lets straight through.
 
 ## Features
 
-- **Token bucket** — smooth average rate with burst allowance up to bucket capacity.
-- **Leaky bucket** — strict constant output rate via a request queue.
-- **Sliding window** — weighted count across the previous and current window, no burst edge.
-- **Fixed window** — simplest counter-per-interval limiter, including its classic edge-burst flaw.
-- **Live simulator** — a TypeScript + WebAssembly demo page driving all four limiters against
+- **Token bucket:** smooth average rate with burst allowance up to bucket capacity.
+- **Leaky bucket:** strict constant output rate via a request queue.
+- **Sliding window:** weighted count across the previous and current window, no burst edge.
+- **Fixed window:** simplest counter-per-interval limiter, including its classic edge-burst flaw.
+- **Live simulator:** a TypeScript + WebAssembly demo page driving all four limiters against
   the same synthetic traffic in real time, plus a "Fire batch (AllowN)" control that sends one
   atomic batch to all four at once so you can see the all-or-nothing admission behavior, not
   just read about it.
@@ -33,11 +39,6 @@ moment sliding-window visibly smooths a burst that fixed-window lets straight th
 - **Library:** Go (stdlib only).
 - **Demo:** the library compiled to WASM (`GOOS=js GOARCH=wasm`), driven from a TypeScript +
   Vite front end. Same algorithm code in the browser as in `go get`.
-
-## Status
-
-The core library and the live burst simulator are built — see [`docs/VISION.md`](docs/VISION.md)
-for the plan and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's built vs. planned.
 
 ## Install
 
@@ -77,7 +78,8 @@ limiter, err := spigot.NewFixedWindow(20, 2*time.Second)
 ```
 
 Every limiter also implements `BulkLimiter.AllowN(t time.Time, n int) bool` for batch
-admission — either all `n` requests are admitted, or none are (no partial consumption):
+admission: either all `n` requests are admitted, or none are, so a rejection never partially
+consumes capacity.
 
 ```go
 if limiter.AllowN(time.Now(), 5) {
@@ -92,6 +94,17 @@ make site-dev    # builds the wasm module, then starts the Vite dev server
 make site-build  # builds the wasm module, then a static site/dist/ bundle
 ```
 
+## Documentation
+
+- [`docs/VISION.md`](docs/VISION.md): what Spigot is for and why it's built this way.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): how the Go library, the WASM bridge, and the
+  simulator fit together.
+- [`docs/DESIGN.md`](docs/DESIGN.md): the visual direction and design tokens.
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
+
+---
+
+More of Charlie's projects → [apps.charliekrug.com](https://apps.charliekrug.com)
